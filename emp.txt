@@ -1,0 +1,36 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import HrDashboard from "./components/HrDashboard";
+import Employee from "./components/Employee";
+import EmployeeManagementPage from "./components/EmployeeManagementPage";
+import EmployeeFormPage from "./components/EmployeeFormPage";
+import AttendanceManagement from "./components/AttendanceManagement";
+import AttendanceInfo from "./components/AttendanceInfo";
+import PayrollHistory from "./components/PayrollHistory";
+import Announcements from "./components/Announcements";
+import EmployeeDashboard from "./components/EmployeeDashboard";
+import SidebarEmployee from "./components/SidebarEmployee";
+import MyAttendance from "./components/MyAttendance";
+import EmploymentPayroll from "./components/EmploymentPayroll";
+import EmployeeAnnouncement from "./components/EmployeeAnnouncement";
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="layout">
+        <SidebarEmployee />
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<HrDashboard />} />
+            <Route path="/employeeDashboard" element={<EmployeeDashboard />} />
+            
+            <Route path="/myattendance" element={<MyAttendance />} />
+            <Route path="/employeeannouncemet" element={<EmployeeAnnouncement/>} />
+            <Route path="/employeePayroll" element={<EmploymentPayroll/>} />
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;

@@ -1,0 +1,36 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import HrDashboard from "./components/HrDashboard";
+import Employee from "./components/Employee";
+import EmployeeManagementPage from "./components/EmployeeManagementPage";
+import EmployeeFormPage from "./components/EmployeeFormPage";
+import AttendanceManagement from "./components/AttendanceManagement";
+import AttendanceInfo from "./components/AttendanceInfo";
+import PayrollHistory from "./components/PayrollHistory";
+import Announcements from "./components/Announcements";
+import EmployeeDashboard from "./components/EmployeeDashboard";
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="layout">
+        <Sidebar />
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<HrDashboard />} />
+            <Route path="/attendance" element={<AttendanceManagement />} />
+            <Route path="/employee" element={<Employee />}>
+              <Route index element={<EmployeeManagementPage />} />
+              <Route path="add" element={<EmployeeFormPage />} />
+            </Route>
+            <Route path="/attendance/info" element={<AttendanceInfo />} />
+            <Route path="/payroll-history" element={<PayrollHistory />} />
+            <Route path="/announcements" element={<Announcements />} />
+            <Route path="/employeeDashboard" element={<EmployeeDashboard />} />
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
