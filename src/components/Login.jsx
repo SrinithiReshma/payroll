@@ -16,9 +16,10 @@ function Login() {
         email,
         password,
       });
-
+      console.log(res.data);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
+      localStorage.setItem("empCode", res.data.empCode); 
 
       if (res.data.role === "ROLE_EMPLOYEE") {
         navigate("/employee");

@@ -1,0 +1,77 @@
+/* Page wrapper inside content area */
+.page-container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* Card style */
+.form-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Header */
+.form-card-header {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Body */
+.form-card-body {
+  padding: 25px;
+}
+
+/* Inputs */
+.form-control,
+.form-select {
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+}
+
+.form-control:focus {
+  border-color: #334155;
+  box-shadow: 0 0 0 2px rgba(51, 65, 85, 0.2);
+}
+
+/* Labels */
+.form-label {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Checkbox */
+.form-check-label {
+  color: #334155;
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn-primary-custom {
+  background-color: #1e293b;
+  border: none;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.btn-primary-custom:hover {
+  background-color: #334155;
+}
+
+.btn-secondary-custom {
+  background-color: #e2e8f0;
+  border: none;
+  color: #1e293b;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.btn-secondary-custom:hover {
+  background-color: #cbd5e1;
+}

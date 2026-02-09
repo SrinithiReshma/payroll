@@ -1,0 +1,110 @@
+/* Card container */
+.attendance-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Header */
+.attendance-header {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Body */
+.attendance-body {
+  padding: 20px;
+}
+
+/* Date picker */
+.date-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.date-picker input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Table */
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendance-table thead {
+  background-color: #f1f5f9;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  color: #334155;
+}
+
+.attendance-table th {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Row hover */
+.attendance-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Inputs */
+.attendance-table select,
+.attendance-table input {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Status colors */
+.status-present {
+  color: #166534;
+}
+
+.status-absent {
+  color: #991b1b;
+}
+
+.status-leave {
+  color: #854d0e;
+}
+
+.status-halfday {
+  color: #1e40af;
+}
+
+/* Save button */
+.btn-save {
+  background-color: #1e293b;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+}
+
+.btn-save:hover {
+  background-color: #334155;
+}
+
+/* Empty state */
+.empty-row {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}

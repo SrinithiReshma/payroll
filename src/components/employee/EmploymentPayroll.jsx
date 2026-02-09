@@ -20,85 +20,75 @@ function EmploymentPayroll() {
     }
   };
 
-  if (loading) return <h3 className="text-center">Loading payroll...</h3>;
+  if (loading) {
+    return (
+      <div style={pageStyle}>
+        <p style={{ color: "#64748b" }}>Loading payroll...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">My Payslips</h2>
+    <div style={pageStyle}>
+      {/* Header */}
+      <div style={headerStyle}>
+        <h2 style={{ margin: 0 }}>My Payslips</h2>
+      </div>
 
       {payrolls.length === 0 ? (
-        <p className="text-center">No payroll records found.</p>
+        <p style={{ textAlign: "center", color: "#64748b" }}>
+          No payroll records found
+        </p>
       ) : (
         payrolls.map((p, index) => (
-          <div key={index} className="card mb-4 shadow">
-            <div className="card-header bg-dark text-white">
-              <h5 className="mb-0">
-                Payslip — {p.month}/{p.year}
-              </h5>
+          <div key={index} style={cardStyle}>
+            {/* Payslip Header */}
+            <div style={cardHeaderStyle}>
+              Payslip — {p.month}/{p.year}
             </div>
 
-            <div className="card-body">
+            <div style={{ padding: "18px" }}>
               {/* Employee Info */}
-              <div className="row mb-3">
-                <div className="col-md-4">
-                  <b>Employee:</b> {p.employeeName}
-                </div>
-                <div className="col-md-4">
-                  <b>Department:</b> {p.department}
-                </div>
-                <div className="col-md-4">
-                  <b>Designation:</b> {p.designation}
-                </div>
+              <div style={infoGrid}>
+                <Info label="Employee" value={p.employeeName} />
+                <Info label="Department" value={p.department} />
+                <Info label="Designation" value={p.designation} />
               </div>
 
-              <hr />
+              <hr style={divider} />
 
               {/* Earnings & Deductions */}
-              <div className="row">
+              <div style={twoColGrid}>
                 {/* Earnings */}
-                <div className="col-md-6">
-                  <h5>Earnings</h5>
-                  <table className="table table-sm">
-                    <tbody>
-                      <tr><td>Basic</td><td className="text-end">₹{p.basic}</td></tr>
-                      <tr><td>HRA</td><td className="text-end">₹{p.hra}</td></tr>
-                      <tr><td>Special Allowance</td><td className="text-end">₹{p.specialAllowance}</td></tr>
-                      <tr><td>TA</td><td className="text-end">₹{p.ta}</td></tr>
-                      <tr><td>Incentive</td><td className="text-end">₹{p.incentive}</td></tr>
-                      <tr><td>Bonus</td><td className="text-end">₹{p.bonus}</td></tr>
-                      <tr className="table-secondary">
-                        <td><b>Gross Salary</b></td>
-                        <td className="text-end"><b>₹{p.grossSalary}</b></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div>
+                  <h4 style={sectionTitle}>Earnings</h4>
+                  <SalaryRow label="Basic" value={p.basic} />
+                  <SalaryRow label="HRA" value={p.hra} />
+                  <SalaryRow label="Special Allowance" value={p.specialAllowance} />
+                  <SalaryRow label="TA" value={p.ta} />
+                  <SalaryRow label="Incentive" value={p.incentive} />
+                  <SalaryRow label="Bonus" value={p.bonus} />
+                  <SalaryTotal label="Gross Salary" value={p.grossSalary} />
                 </div>
 
                 {/* Deductions */}
-                <div className="col-md-6">
-                  <h5>Deductions</h5>
-                  <table className="table table-sm">
-                    <tbody>
-                      <tr><td>PF</td><td className="text-end">₹{p.pf}</td></tr>
-                      <tr><td>Professional Tax</td><td className="text-end">₹{p.pt}</td></tr>
-                      <tr><td>TDS</td><td className="text-end">₹{p.tds.toFixed(2)}</td></tr>
-                      <tr><td>LOP Amount</td><td className="text-end">₹{p.lopAmount}</td></tr>
-                      <tr className="table-secondary">
-                        <td><b>Total Deductions</b></td>
-                        <td className="text-end"><b>₹{p.totalDeductions.toFixed(2)}</b></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div>
+                  <h4 style={sectionTitle}>Deductions</h4>
+                  <SalaryRow label="PF" value={p.pf} />
+                  <SalaryRow label="Professional Tax" value={p.pt} />
+                  <SalaryRow label="TDS" value={p.tds.toFixed(2)} />
+                  <SalaryRow label="LOP Amount" value={p.lopAmount} />
+                  <SalaryTotal label="Total Deductions" value={p.totalDeductions.toFixed(2)} />
                 </div>
               </div>
 
-              <hr />
+              <hr style={divider} />
 
               {/* Net Salary */}
-              <div className="text-end">
-                <h4 className="text-success">
+              <div style={{ textAlign: "right" }}>
+                <h3 style={{ color: "#166534" }}>
                   Net Salary: ₹{p.netSalary.toFixed(2)}
-                </h4>
+                </h3>
               </div>
             </div>
           </div>
@@ -107,5 +97,94 @@ function EmploymentPayroll() {
     </div>
   );
 }
+
+
+function Info({ label, value }) {
+  return (
+    <div>
+      <div style={{ fontSize: "13px", color: "#64748b" }}>{label}</div>
+      <div style={{ fontWeight: "600", color: "#334155" }}>{value}</div>
+    </div>
+  );
+}
+
+function SalaryRow({ label, value }) {
+  return (
+    <div style={rowStyle}>
+      <span>{label}</span>
+      <span>₹{value}</span>
+    </div>
+  );
+}
+
+function SalaryTotal({ label, value }) {
+  return (
+    <div style={{ ...rowStyle, background: "#f1f5f9", fontWeight: "600" }}>
+      <span>{label}</span>
+      <span>₹{value}</span>
+    </div>
+  );
+}
+
+
+const pageStyle = {
+  padding: "25px",
+  backgroundColor: "#f8fafc",
+  minHeight: "100vh",
+};
+
+const headerStyle = {
+  backgroundColor: "#1e293b",
+  color: "white",
+  padding: "15px 20px",
+  borderRadius: "8px",
+  marginBottom: "20px",
+};
+
+const cardStyle = {
+  background: "white",
+  borderRadius: "12px",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+  marginBottom: "24px",
+  overflow: "hidden",
+};
+
+const cardHeaderStyle = {
+  backgroundColor: "#334155",
+  color: "white",
+  padding: "12px 18px",
+  fontWeight: "600",
+};
+
+const infoGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+  gap: "16px",
+};
+
+const twoColGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "20px",
+};
+
+const sectionTitle = {
+  marginBottom: "10px",
+  color: "#1e293b",
+};
+
+const rowStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "8px 10px",
+  borderBottom: "1px solid #e2e8f0",
+  color: "#334155",
+};
+
+const divider = {
+  border: "none",
+  borderTop: "1px solid #e2e8f0",
+  margin: "16px 0",
+};
 
 export default EmploymentPayroll;

@@ -1,0 +1,91 @@
+/* Card container */
+.payroll-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Header */
+.payroll-header {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Body */
+.payroll-body {
+  padding: 20px;
+}
+
+/* Filter row */
+.payroll-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.payroll-filters input[type="month"] {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Button */
+.btn-fetch {
+  background-color: #1e293b;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.btn-fetch:hover {
+  background-color: #334155;
+}
+
+/* Table */
+.payroll-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payroll-table thead {
+  background-color: #f1f5f9;
+}
+
+.payroll-table th,
+.payroll-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  color: #334155;
+}
+
+.payroll-table th {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Hover */
+.payroll-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Empty state */
+.payroll-empty {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+
+/* Salary highlight */
+.salary {
+  font-weight: 600;
+  color: #166534;
+}

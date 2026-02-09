@@ -1,0 +1,106 @@
+/* Card container */
+.announcement-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Header */
+.announcement-header {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Body */
+.announcement-body {
+  padding: 20px;
+}
+
+/* Form */
+.announcement-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.announcement-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+.announcement-form input:focus {
+  border-color: #334155;
+  box-shadow: 0 0 0 2px rgba(51, 65, 85, 0.2);
+  outline: none;
+}
+
+/* Buttons */
+.btn-submit {
+  background-color: #1e293b;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+}
+
+.btn-submit:hover {
+  background-color: #334155;
+}
+
+.btn-update {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-left: 8px;
+}
+
+.btn-update:hover {
+  background-color: #cbd5e1;
+}
+
+.btn-delete {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-left: 8px;
+}
+
+.btn-delete:hover {
+  background-color: #fecaca;
+}
+
+/* Messages list */
+.announcement-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.announcement-item {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Empty state */
+.empty-announcement {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}

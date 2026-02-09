@@ -16,14 +16,15 @@ function AttendanceInfo() {
   const [bonus, setBonus] = useState(0);
 
   const [selectedPayslip, setSelectedPayslip] = useState(null);
+
   const getDetails = async (m, y) => {
     try {
-      const response = await apiClient.get(`/attendance/employee/month`, {
+      const res = await apiClient.get("/attendance/employee/month", {
         params: { month: m, year: y },
       });
-      setData(response.data);
-    } catch (error) {
-      console.log("Error fetching attendance details:", error);
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -31,13 +32,12 @@ function AttendanceInfo() {
     getDetails(month, year);
   }, []);
 
-  const fetchAttendance = () => {
-    getDetails(month, year);
-  };
+  const fetchAttendance = () => getDetails(month, year);
+
   const generatePayslip = (record, taValue, incentiveValue, bonusValue) => {
     const totalDays = Number(totalWorkingDays);
-    if (totalDays === 0) {
-      alert("Please enter Total Working Days");
+    if (!totalDays) {
+      alert("Enter Total Working Days");
       return null;
     }
 
@@ -46,16 +46,14 @@ function AttendanceInfo() {
     const halfDay = Number(record.HALF_DAY || 0);
 
     const paidDays = present + leave + halfDay * 0.5;
-    const lopDays = totalDays > 0 ? Math.max(totalDays - paidDays, 0) : 0;
+    const lopDays = Math.max(totalDays - paidDays, 0);
 
     const fixedSalary = Number(record.Salary || 0);
-
     const taNum = Number(taValue || 0);
     const incentiveNum = Number(incentiveValue || 0);
     const bonusNum = Number(bonusValue || 0);
 
-    const variablePay = taNum + incentiveNum + bonusNum;
-    const grossSalary = fixedSalary + variablePay;
+    const grossSalary = fixedSalary + taNum + incentiveNum + bonusNum;
 
     const basic = fixedSalary * 0.4;
     const hra = fixedSalary * 0.2;
@@ -65,19 +63,17 @@ function AttendanceInfo() {
     const pt = fixedSalary > 20000 ? 200 : 0;
 
     const annualGross = grossSalary * 12;
-
     let yearlyTax = 0;
-    if (annualGross > 300000 && annualGross <= 600000) {
+
+    if (annualGross > 300000 && annualGross <= 600000)
       yearlyTax = (annualGross - 300000) * 0.05;
-    } else if (annualGross > 600000 && annualGross <= 900000) {
+    else if (annualGross > 600000 && annualGross <= 900000)
       yearlyTax = 15000 + (annualGross - 600000) * 0.1;
-    } else if (annualGross > 900000) {
+    else if (annualGross > 900000)
       yearlyTax = 45000 + (annualGross - 900000) * 0.15;
-    }
 
     const tds = yearlyTax / 12;
-    const perDayFixed = totalDays > 0 ? fixedSalary / totalDays : 0;
-    const lopAmount = lopDays * perDayFixed;
+    const lopAmount = (fixedSalary / totalDays) * lopDays;
 
     const totalDeductions = pf + pt + tds + lopAmount;
     const netSalary = grossSalary - totalDeductions;
@@ -87,273 +83,169 @@ function AttendanceInfo() {
       employeeName: record.EmployeeName,
       department: record.department,
       designation: record.designation,
-
       month,
       year,
-
       totalWorkingDays: totalDays,
       paidDays,
       lopDays,
-
       earnings: {
-        basic: Number(basic),
-        hra: Number(hra),
-        specialAllowance: Number(specialAllowance),
+        basic,
+        hra,
+        specialAllowance,
         ta: taNum,
         incentive: incentiveNum,
         bonus: bonusNum,
-        fixedSalary: Number(fixedSalary),
-        grossSalary: Number(grossSalary),
+        fixedSalary,
+        grossSalary,
       },
-
       deductions: {
-        pf: Number(pf),
-        pt: Number(pt),
-        tds: Number(tds),
-        lopAmount: Number(lopAmount),
-        totalDeductions: Number(totalDeductions),
+        pf,
+        pt,
+        tds,
+        lopAmount,
+        totalDeductions,
       },
-
-      netSalary: Number(netSalary),
+      netSalary,
     };
   };
+
   const savePayslipdetails = async () => {
-    if (!selectedPayslip) {
-      alert("generate payslip first ");
-      return;
-    }
+    if (!selectedPayslip) return alert("Generate payslip first");
 
     try {
       await apiClient.post("employee/payslip/save", {
-        employeeId: selectedPayslip.employeeId,
-        employeeName: selectedPayslip.employeeName,
-        department: selectedPayslip.department,
-        designation: selectedPayslip.designation,
-        month: selectedPayslip.month,
-        year: selectedPayslip.year,
-        totalWorkingDays: selectedPayslip.totalWorkingDays,
-        paidDays: selectedPayslip.paidDays,
-        lopDays: selectedPayslip.lopDays,
-
-        basic: selectedPayslip.earnings.basic,
-        hra: selectedPayslip.earnings.hra,
-        specialAllowance: selectedPayslip.earnings.specialAllowance,
-        ta: selectedPayslip.earnings.ta,
-        incentive: selectedPayslip.earnings.incentive,
-        bonus: selectedPayslip.earnings.bonus,
-        fixedSalary: selectedPayslip.earnings.fixedSalary,
-        grossSalary: selectedPayslip.earnings.grossSalary,
-
-        pf: selectedPayslip.deductions.pf,
-        pt: selectedPayslip.deductions.pt,
-        tds: selectedPayslip.deductions.tds,
-        lopAmount: selectedPayslip.deductions.lopAmount,
-        totalDeductions: selectedPayslip.deductions.totalDeductions,
-
-        netSalary: selectedPayslip.netSalary,
+        ...selectedPayslip,
+        ...selectedPayslip.earnings,
+        ...selectedPayslip.deductions,
       });
-
-      alert("payslip saved successfully");
-    } catch (err) {
-      console.log(err);
-      alert("error saving payslip");
+      alert("Payslip saved successfully");
+    } catch {
+      alert("Error saving payslip");
     }
   };
 
   return (
-    <div>
-      <h2>Payslip Board</h2>
+    <div style={{ padding: "25px", background: "#f8fafc", minHeight: "100vh" }}>
+      <div style={{ background: "#1e293b", color: "#fff", padding: "15px", borderRadius: "8px" }}>
+        <h2 style={{ margin: 0 }}>Payslip Board</h2>
+      </div>
 
-      <label>Total Working Days: </label>
-      <input
-        type="number"
-        value={totalWorkingDays}
-        onChange={(e) => setTotalWorkingDays(e.target.value)}
-        placeholder="Total Working Days"
-        style={{ marginRight: "10px" }}
-      />
+      <div
+        style={{
+          background: "#fff",
+          padding: "20px",
+          marginTop: "20px",
+          borderRadius: "10px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+        }}
+      >
+        <div style={{ display: "flex", gap: "12px", marginBottom: "15px", flexWrap: "wrap" }}>
+          <input
+            type="number"
+            placeholder="Total Working Days"
+            value={totalWorkingDays}
+            onChange={(e) => setTotalWorkingDays(e.target.value)}
+            style={{ padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+          />
 
-      <label>
-        Month:
-        <input
-          type="month"
-          value={monthInput}
-          min="2020-01"
-          max="2030-12"
-          onChange={(e) => {
-            const value = e.target.value;
-            setMonthInput(value);
+          <input
+            type="month"
+            value={monthInput}
+            onChange={(e) => {
+              const [y, m] = e.target.value.split("-");
+              setMonthInput(e.target.value);
+              setMonth(Number(m));
+              setYear(Number(y));
+            }}
+            style={{ padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+          />
 
-            const [y, m] = value.split("-");
-            setMonth(Number(m));
-            setYear(Number(y));
-          }}
-        />
-      </label>
+          <button
+            onClick={fetchAttendance}
+            style={{
+              background: "#1e293b",
+              color: "#fff",
+              border: "none",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            Load
+          </button>
+        </div>
 
-      <button onClick={fetchAttendance} style={{ marginLeft: "10px" }}>
-        Load
-      </button>
-
-      <table border="1" cellPadding="5" cellSpacing="0" style={{ marginTop: "15px" }}>
-        <thead>
-          <tr>
-            <th>Employee ID</th>
-            <th>Employee Name</th>
-            <th>Salary</th>
-            <th>Department</th>
-            <th>Designation</th>
-            <th>Present</th>
-            <th>Absent</th>
-            <th>Leave</th>
-            <th>Half Day</th>
-            <th>Payslip</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {data.map((record) => (
-            <tr key={record.employeeId}>
-              <td>{record.employeeId}</td>
-              <td>{record.EmployeeName}</td>
-              <td>{record.Salary}</td>
-              <td>{record.department}</td>
-              <td>{record.designation}</td>
-              <td>{record.PRESENT || 0}</td>
-              <td>{record.ABSENT || 0}</td>
-              <td>{record.LEAVE || 0}</td>
-              <td>{record.HALF_DAY || 0}</td>
-              <td>
-                <button
-                  onClick={() => {
-                    setCurrentRecord(record);
-                    setTa(0);
-                    setIncentive(0);
-                    setBonus(0);
-                    setShowPopup(true);
-                  }}
-                >
-                  Generate
-                </button>
-              </td>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead style={{ background: "#f1f5f9" }}>
+            <tr>
+              {["ID", "Name", "Salary", "Dept", "Desig", "P", "A", "L", "HD", "Payslip"].map(h => (
+                <th key={h} style={{ padding: "10px", borderBottom: "1px solid #e2e8f0" }}>{h}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map(r => (
+              <tr key={r.employeeId}>
+                <td>{r.employeeId}</td>
+                <td>{r.EmployeeName}</td>
+                <td>₹ {r.Salary}</td>
+                <td>{r.department}</td>
+                <td>{r.designation}</td>
+                <td>{r.PRESENT || 0}</td>
+                <td>{r.ABSENT || 0}</td>
+                <td>{r.LEAVE || 0}</td>
+                <td>{r.HALF_DAY || 0}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      setCurrentRecord(r);
+                      setTa(0);
+                      setIncentive(0);
+                      setBonus(0);
+                      setShowPopup(true);
+                    }}
+                    style={{ background: "#334155", color: "#fff", border: "none", padding: "6px 10px", borderRadius: "5px" }}
+                  >
+                    Generate
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {selectedPayslip && (
+          <div style={{ marginTop: "20px", padding: "15px", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
+            <h2 style={{ color: "#166534" }}>Net Salary: ₹ {selectedPayslip.netSalary.toFixed(2)}</h2>
+            <button
+              onClick={savePayslipdetails}
+              style={{ background: "#166534", color: "#fff", border: "none", padding: "10px 16px", borderRadius: "6px" }}
+            >
+              Save Payslip
+            </button>
+          </div>
+        )}
+      </div>
+
       {showPopup && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 9999,
-          }}
-        >
-          <div style={{ background: "white", padding: "20px", width: "350px", borderRadius: "10px" }}>
-            <h3>Enter Variable Components</h3>
-
-            <label>Travel Allowance (TA):</label>
-            <input
-              type="number"
-              value={ta}
-              onChange={(e) => setTa(e.target.value)}
-              style={{ width: "100%", marginBottom: "10px" }}
-            />
-
-            <label>Incentive:</label>
-            <input
-              type="number"
-              value={incentive}
-              onChange={(e) => setIncentive(e.target.value)}
-              style={{ width: "100%", marginBottom: "10px" }}
-            />
-
-            <label>Bonus:</label>
-            <input
-              type="number"
-              value={bonus}
-              onChange={(e) => setBonus(e.target.value)}
-              style={{ width: "100%", marginBottom: "10px" }}
-            />
-
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "15px" }}>
-              <button
-                onClick={() => {
-                  setShowPopup(false);
-                  setCurrentRecord(null);
-                }}
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={() => {
-                  const payslip = generatePayslip(currentRecord, ta, incentive, bonus);
-                  if (payslip) {
-                    setSelectedPayslip(payslip);
-                  }
-                  setShowPopup(false);
-                }}
-              >
-                Generate Payslip
-              </button>
+        <div style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
+          display: "flex", justifyContent: "center", alignItems: "center"
+        }}>
+          <div style={{ background: "#fff", padding: "20px", width: "320px", borderRadius: "10px" }}>
+            <h3>Variable Pay</h3>
+            <input type="number" placeholder="TA" value={ta} onChange={e => setTa(e.target.value)} style={{ width: "100%", marginBottom: "8px" }} />
+            <input type="number" placeholder="Incentive" value={incentive} onChange={e => setIncentive(e.target.value)} style={{ width: "100%", marginBottom: "8px" }} />
+            <input type="number" placeholder="Bonus" value={bonus} onChange={e => setBonus(e.target.value)} style={{ width: "100%", marginBottom: "12px" }} />
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button onClick={() => setShowPopup(false)}>Cancel</button>
+              <button onClick={() => {
+                const p = generatePayslip(currentRecord, ta, incentive, bonus);
+                if (p) setSelectedPayslip(p);
+                setShowPopup(false);
+              }}>Generate</button>
             </div>
           </div>
-        </div>
-      )}
-      {selectedPayslip && (
-        <div style={{ marginTop: "20px", border: "1px solid black", padding: "15px" }}>
-          <h2>Payslip</h2>
-          <p>
-            <b>Employee:</b> {selectedPayslip.employeeName} ({selectedPayslip.employeeId})
-          </p>
-          <p>
-            <b>Department:</b> {selectedPayslip.department}
-          </p>
-          <p>
-            <b>Designation:</b> {selectedPayslip.designation}
-          </p>
-          <p>
-            <b>Month/Year:</b> {selectedPayslip.month}/{selectedPayslip.year}
-          </p>
-
-          <hr />
-          <h3>Attendance</h3>
-          <p>Total Working Days: {selectedPayslip.totalWorkingDays}</p>
-          <p>Paid Days: {selectedPayslip.paidDays}</p>
-          <p>LOP Days: {selectedPayslip.lopDays}</p>
-          <hr />
-          <h3>Earnings</h3>
-          <p>Basic: ₹{selectedPayslip.earnings.basic.toFixed(2)}</p>
-          <p>HRA: ₹{selectedPayslip.earnings.hra.toFixed(2)}</p>
-          <p>Special Allowance: ₹{selectedPayslip.earnings.specialAllowance.toFixed(2)}</p>
-          <p>TA: ₹{selectedPayslip.earnings.ta.toFixed(2)}</p>
-          <p>Incentive: ₹{selectedPayslip.earnings.incentive.toFixed(2)}</p>
-          <p>Bonus: ₹{selectedPayslip.earnings.bonus.toFixed(2)}</p>
-          <p>
-            <b>Gross Salary:</b> ₹{selectedPayslip.earnings.grossSalary.toFixed(2)}
-          </p>
-          <hr />
-          <h3>Deductions</h3>
-          <p>PF: ₹{selectedPayslip.deductions.pf.toFixed(2)}</p>
-          <p>Professional Tax: ₹{selectedPayslip.deductions.pt.toFixed(2)}</p>
-          <p>TDS: ₹{selectedPayslip.deductions.tds.toFixed(2)}</p>
-          <p>LOP Amount: ₹{selectedPayslip.deductions.lopAmount.toFixed(2)}</p>
-          <p>
-            <b>Total Deductions:</b> ₹{selectedPayslip.deductions.totalDeductions.toFixed(2)}
-          </p>
-
-          <hr />
-
-          <h2>Net Salary: ₹{selectedPayslip.netSalary.toFixed(2)}</h2>
-
-          <button onClick={savePayslipdetails}>Save Payslip</button>
         </div>
       )}
     </div>

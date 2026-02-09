@@ -1,162 +1,164 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../api/apiClient";
-
-
+import "./attendance.css";
 
 function AttendanceManagement() {
+
   const [employees, setEmployees] = useState([]);
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [attendanceData, setAttendanceData] = useState({});
+
+  // Fetch employees
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await apiClient.get("/employee/all");
-        console.log("Fetched employees:", response.data);
-        setEmployees(response.data);
-      } catch (error) {
-        console.log("Error fetching employees:", error);
+        const res = await apiClient.get("/employee/all");
+        setEmployees(res.data);
+      } catch (err) {
+        console.error("Error fetching employees", err);
       }
     };
-
-
     fetchEmployees();
   }, []);
 
-
+  // Fetch attendance by date
   useEffect(() => {
     const fetchAttendanceByDate = async () => {
       try {
-        const response = await apiClient.get(`/attendance/date/${date}`);
-        console.log("Fetched attendance:", response.data);
+        const res = await apiClient.get(`/attendance/date/${date}`);
         const map = {};
-        response.data.forEach((a) => {
+
+        res.data.forEach(a => {
           map[a.employee.id] = {
             status: a.status,
-            remarks: a.remarks || "",
+            remarks: a.remarks || ""
           };
         });
 
-
         setAttendanceData(map);
-      } catch (error) {
-        console.log("No attendance for date:", date);
+      } catch {
         setAttendanceData({});
       }
     };
-
-
     fetchAttendanceByDate();
   }, [date]);
 
-
-  const handleChange = (employeeId, field, value) => {
-    setAttendanceData((prev) => ({
+  const handleChange = (empId, field, value) => {
+    setAttendanceData(prev => ({
       ...prev,
-      [employeeId]: {
-        ...prev[employeeId],
-        [field]: value,
-      },
+      [empId]: {
+        ...prev[empId],
+        [field]: value
+      }
     }));
   };
 
-
-  const handleSave = async (employeeId) => {
+  const handleSave = async (empId) => {
     try {
-      const data = attendanceData[employeeId];
-
+      const data = attendanceData[empId] || {};
 
       const payload = {
-        employeeId: employeeId,
+        employeeId: empId,
         attendanceDate: date,
-        status: data?.status || "PRESENT",
-        remarks: data?.remarks || "",
+        status: data.status || "PRESENT",
+        remarks: data.remarks || ""
       };
 
-
       await apiClient.post("/attendance/mark", payload);
-
-
-      alert("Attendance Saved");
-    } catch (error) {
-      console.log("Error saving attendance:", error);
-      alert("Failed");
+      alert("Attendance saved");
+    } catch (err) {
+      alert("Failed to save attendance");
     }
   };
 
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Attendance Management</h2>
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ fontWeight: "bold" }}>
-          Select Date:{" "}
+    <div className="attendance-card">
+      <div className="attendance-header">
+        Attendance Management
+      </div>
+
+      <div className="attendance-body">
+
+        <div className="date-picker">
+          <span>Select Date:</span>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
-        </label>
-      </div>
-      <table border="1" cellPadding="10" style={{ width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Employee Code</th>
-            <th>Full Name</th>
-            <th>Department</th>
-            <th>Status</th>
-            <th>Remarks</th>
-            <th>Save</th>
-          </tr>
-        </thead>
+        </div>
 
-
-        <tbody>
-          {employees.length === 0 ? (
+        <table className="attendance-table">
+          <thead>
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
-                No Employees Found
-              </td>
+              <th>Employee Code</th>
+              <th>Full Name</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Remarks</th>
+              <th>Save</th>
             </tr>
-          ) : (
-            employees.map((emp) => (
-              <tr key={emp.id}>
-                <td>{emp.employeeCode}</td>
-                <td>{emp.fullName}</td>
-                <td>{emp.department}</td>
-                <td>
-                  <select
-                    value={attendanceData[emp.id]?.status || "PRESENT"}
-                    onChange={(e) =>
-                      handleChange(emp.id, "status", e.target.value)
-                    }
-                  >
-                    <option value="PRESENT">PRESENT</option>
-                    <option value="ABSENT">ABSENT</option>
-                    <option value="LEAVE">LEAVE</option>
-                    <option value="HALFDAY">HALFDAY</option>
-                  </select>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    placeholder="Remarks..."
-                    value={attendanceData[emp.id]?.remarks || ""}
-                    onChange={(e) =>
-                      handleChange(emp.id, "remarks", e.target.value)
-                    }
-                  />
-                </td>
-                <td>
-                  <button onClick={() => handleSave(emp.id)}>Save</button>
+          </thead>
+
+          <tbody>
+            {employees.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="empty-row">
+                  No Employees Found
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              employees.map(emp => (
+                <tr key={emp.id}>
+                  <td>{emp.employeeCode}</td>
+                  <td>{emp.fullName}</td>
+                  <td>{emp.department}</td>
+
+                  <td>
+                    <select
+                      className={`status-${(attendanceData[emp.id]?.status || "present").toLowerCase()}`}
+                      value={attendanceData[emp.id]?.status || "PRESENT"}
+                      onChange={(e) =>
+                        handleChange(emp.id, "status", e.target.value)
+                      }
+                    >
+                      <option value="PRESENT">PRESENT</option>
+                      <option value="ABSENT">ABSENT</option>
+                      <option value="LEAVE">LEAVE</option>
+                      <option value="HALFDAY">HALFDAY</option>
+                    </select>
+                  </td>
+
+                  <td>
+                    <input
+                      type="text"
+                      placeholder="Remarks..."
+                      value={attendanceData[emp.id]?.remarks || ""}
+                      onChange={(e) =>
+                        handleChange(emp.id, "remarks", e.target.value)
+                      }
+                    />
+                  </td>
+
+                  <td>
+                    <button
+                      className="btn-save"
+                      onClick={() => handleSave(emp.id)}
+                    >
+                      Save
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+
+      </div>
     </div>
   );
 }
-
 
 export default AttendanceManagement;

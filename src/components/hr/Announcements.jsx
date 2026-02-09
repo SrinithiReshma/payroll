@@ -1,7 +1,9 @@
 import React from "react";
 import apiClient from "../../api/apiClient";
+import "./announcements.css";
 
 function Announcements() {
+
   const [message, setMessage] = React.useState("");
   const [messages, setMessages] = React.useState([]);
 
@@ -12,7 +14,6 @@ function Announcements() {
   const getMessages = async () => {
     try {
       const res = await apiClient.get("/employee/announcements");
-      console.log("Announcements Data:", res.data);
       setMessages(res.data);
     } catch (error) {
       console.error("Error fetching announcements:", error);
@@ -21,10 +22,10 @@ function Announcements() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!message.trim()) return;
 
     try {
-      const res = await apiClient.post("/announcements/save", { message: message });
-      console.log("Announcement submitted:", res.data);
+      await apiClient.post("/announcements/save", { message });
       setMessage("");
       getMessages();
     } catch (error) {
@@ -33,29 +34,24 @@ function Announcements() {
   };
 
   const updateMessage = async (id, oldMessage) => {
-    const newMessage = prompt("Enter new message:", oldMessage);
-
-    if (!newMessage || newMessage.trim() === "") {
-      alert("Message cannot be empty!");
-      return;
-    }
+    const newMessage = prompt("Update announcement:", oldMessage);
+    if (!newMessage || !newMessage.trim()) return;
 
     try {
-      const res = await apiClient.put(`/announcements/update/${id}`, {
+      await apiClient.put(`/announcements/update/${id}`, {
         message: newMessage,
       });
-
-      console.log("Announcement updated:", res.data);
       getMessages();
     } catch (error) {
       console.error("Error updating message:", error);
     }
   };
+
   const deleteMessage = async (id) => {
-    if (!window.confirm("are you sure you want to delete this announcement?")) return;
+    if (!window.confirm("Are you sure you want to delete this announcement?")) return;
+
     try {
-      const res = await apiClient.delete(`/announcements/delete/${id}`);
-      console.log("Announcement deleted:", res.data);
+      await apiClient.delete(`/announcements/delete/${id}`);
       getMessages();
     } catch (error) {
       console.error("Error deleting announcement:", error);
@@ -63,38 +59,64 @@ function Announcements() {
   };
 
   return (
-    <div>
-      <h1>Announcements</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter your announcement"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit">Submit</button>
-      </form>
-      <div>
-        <h2>Messages</h2>
-        <ul>
-          {messages.map((msg) => (
-            <li key={msg.announcementId} style={{ marginBottom: "10px" }}>
-              {msg.message}
-              <button
-                style={{ marginLeft: "10px" }}
-                onClick={() => updateMessage(msg.announcementId, msg.message)}
+    <div className="announcement-card">
+      <div className="announcement-header">
+        Announcements
+      </div>
+
+      <div className="announcement-body">
+
+        {/* Create announcement */}
+        <form className="announcement-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Enter your announcement..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button type="submit" className="btn-submit">
+            Post
+          </button>
+        </form>
+
+        {/* List announcements */}
+        {messages.length === 0 ? (
+          <div className="empty-announcement">
+            No announcements yet
+          </div>
+        ) : (
+          <ul className="announcement-list">
+            {messages.map(msg => (
+              <li
+                key={msg.announcementId}
+                className="announcement-item"
               >
-                Update
-              </button>
-              <button
-                style={{ marginLeft: "10px", color: "red" }}
-                onClick={() => deleteMessage(msg.announcementId)}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
+                <span>{msg.message}</span>
+
+                <div>
+                  <button
+                    className="btn-update"
+                    onClick={() =>
+                      updateMessage(msg.announcementId, msg.message)
+                    }
+                  >
+                    Update
+                  </button>
+
+                  <button
+                    className="btn-delete"
+                    onClick={() =>
+                      deleteMessage(msg.announcementId)
+                    }
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
       </div>
     </div>
   );
